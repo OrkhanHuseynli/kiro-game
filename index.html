@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Kiro World</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #87CEEB, #E0F6FF);
+            font-family: 'Arial', sans-serif;
+        }
+        #gameContainer {
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        #gameCanvas {
+            display: block;
+            background: #87CEEB;
+        }
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 24px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+        #gameOver, #levelComplete {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+            z-index: 20;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="ui">
+            <div>Score: <span id="score">0</span></div>
+            <div>High Score: <span id="highScore">0</span></div>
+            <div>Lives: <span id="lives">3</span></div>
+        </div>
+        <div id="gameOver">
+            <h1>Game Over!</h1>
+            <p>Final Score: <span id="finalScore">0</span></p>
+            <button onclick="game.restart()">Restart</button>
+        </div>
+        <div id="levelComplete">
+            <h1>Level Complete!</h1>
+            <p>Score: <span id="completeScore">0</span></p>
+            <button onclick="game.nextLevel()">Next Level</button>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
