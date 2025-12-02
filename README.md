@@ -41,8 +41,8 @@ A browser-based 2D platformer game featuring the Kiro mascot with stunning visua
 |--------|------|
 | Move Left | `←` or `A` |
 | Move Right | `→` or `D` |
-| Jump | `↑`, `Space`, or `W` |
-| Shoot Fireball | `F` or `Shift` |
+| Jump | `↑` or `W` |
+| Shoot Fireball | `Space`, `F`, or `Shift` |
 
 ## 🚀 Getting Started
 

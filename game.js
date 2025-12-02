@@ -832,8 +832,8 @@ class Game {
         window.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft' || e.key === 'a') this.keys.left = true;
             if (e.key === 'ArrowRight' || e.key === 'd') this.keys.right = true;
-            if (e.key === 'ArrowUp' || e.key === ' ' || e.key === 'w') this.keys.jump = true;
-            if (e.key === 'f' || e.key === 'F' || e.key === 'Shift') {
+            if (e.key === 'ArrowUp' || e.key === 'w') this.keys.jump = true;
+            if (e.key === ' ' || e.key === 'f' || e.key === 'F' || e.key === 'Shift') {
                 if (!this.keys.fire) {
                     this.keys.fire = true;
                     this.player.shootFireball(this.projectileManager);
@@ -844,8 +844,8 @@ class Game {
         window.addEventListener('keyup', (e) => {
             if (e.key === 'ArrowLeft' || e.key === 'a') this.keys.left = false;
             if (e.key === 'ArrowRight' || e.key === 'd') this.keys.right = false;
-            if (e.key === 'ArrowUp' || e.key === ' ' || e.key === 'w') this.keys.jump = false;
-            if (e.key === 'f' || e.key === 'F' || e.key === 'Shift') this.keys.fire = false;
+            if (e.key === 'ArrowUp' || e.key === 'w') this.keys.jump = false;
+            if (e.key === ' ' || e.key === 'f' || e.key === 'F' || e.key === 'Shift') this.keys.fire = false;
         });
     }
 
