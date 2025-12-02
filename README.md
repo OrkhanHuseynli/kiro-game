@@ -16,8 +16,11 @@ A browser-based 2D platformer game featuring the Kiro mascot with stunning visua
 ### 🔥 Combat System
 - **Fireball shooting** - Press `F` or `Shift` to shoot fireballs
 - **Direction-based firing** - Fireballs travel in the direction Kiro is facing
-- **Collision detection** - Fireballs explode on impact with platforms
+- **Enemy anti-heroes** - Defeat Google and Azure enemies patrolling the levels
+- **Enemy AI** - Enemies patrol back and forth on platforms
+- **Collision detection** - Fireballs explode on impact with platforms and enemies
 - **Multiple projectiles** - Up to 10 active fireballs at once
+- **Enemy rewards** - Earn 500 points for each defeated enemy
 
 ### 🎨 Visual Effects
 - **Trail particles** - Dynamic particles follow Kiro during movement
@@ -98,6 +101,7 @@ kiro-game/
 - **`Player`** - Character movement, physics, and collision
 - **`Platform`** - Static level geometry
 - **`Collectible`** - Rotating collectible items
+- **`Enemy`** - AI-controlled anti-heroes with patrol behavior
 - **`Game`** - Main game controller and loop
 
 ## 🎨 Visual Effects System
@@ -113,6 +117,7 @@ The game features a sophisticated particle system with multiple effect types:
 ## 🏆 Scoring
 
 - **Collectibles**: +100 points each
+- **Defeated Enemies**: +500 points each
 - **High Score**: Automatically saved to browser storage
 - **Confetti Celebration**: Triggered on new high score achievement
 
@@ -120,9 +125,11 @@ The game features a sophisticated particle system with multiple effect types:
 
 1. **Master the jump timing** - Use momentum to reach higher platforms
 2. **Collect everything** - Each collectible brings you closer to a high score
-3. **Use fireballs strategically** - Clear obstacles and create spectacular explosions
-4. **Watch your lives** - Falling off the map costs a life!
-5. **Aim for the high score** - Beat your personal best and trigger confetti!
+3. **Defeat enemies** - Use fireballs to eliminate Google and Azure anti-heroes for big points
+4. **Avoid enemy contact** - Touching enemies costs a life!
+5. **Use fireballs strategically** - Clear obstacles and enemies with spectacular explosions
+6. **Watch your lives** - Falling off the map or touching enemies costs a life!
+7. **Aim for the high score** - Beat your personal best and trigger confetti!
 
 ## 🔧 Configuration
 

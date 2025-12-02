@@ -15,6 +15,12 @@ const CONFIG = {
     camera: {
         smoothness: 0.1
     },
+    enemy: {
+        width: 40,
+        height: 40,
+        speed: 2,
+        patrolDistance: 150
+    },
     particles: {
         trail: {
             sizeMin: 3,
@@ -641,6 +647,78 @@ class Collectible {
     }
 }
 
+class Enemy {
+    constructor(x, y, type, image) {
+        this.x = x;
+        this.y = y;
+        this.startX = x;
+        this.width = CONFIG.enemy.width;
+        this.height = CONFIG.enemy.height;
+        this.type = type; // 'google' or 'azure'
+        this.image = image;
+        this.velocityX = CONFIG.enemy.speed;
+        this.patrolDistance = CONFIG.enemy.patrolDistance;
+        this.alive = true;
+        this.health = 1;
+    }
+
+    update() {
+        if (!this.alive) return;
+
+        // Patrol back and forth
+        this.x += this.velocityX;
+
+        // Reverse direction at patrol boundaries
+        if (this.x > this.startX + this.patrolDistance || this.x < this.startX - this.patrolDistance) {
+            this.velocityX *= -1;
+        }
+    }
+
+    draw(ctx, cameraX) {
+        if (!this.alive) return;
+
+        if (this.image && this.image.complete) {
+            ctx.drawImage(this.image, this.x - cameraX, this.y, this.width, this.height);
+        } else {
+            // Fallback color based on type
+            ctx.fillStyle = this.type === 'google' ? '#4285F4' : '#0078D4';
+            ctx.fillRect(this.x - cameraX, this.y, this.width, this.height);
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(this.x - cameraX, this.y, this.width, this.height);
+        }
+    }
+
+    checkCollisionWithPlayer(player) {
+        if (!this.alive) return false;
+
+        return player.x < this.x + this.width &&
+               player.x + player.width > this.x &&
+               player.y < this.y + this.height &&
+               player.y + player.height > this.y;
+    }
+
+    checkCollisionWithFireball(fireball) {
+        if (!this.alive) return false;
+
+        return fireball.x < this.x + this.width &&
+               fireball.x + fireball.width > this.x &&
+               fireball.y < this.y + this.height &&
+               fireball.y + fireball.height > this.y;
+    }
+
+    takeDamage() {
+        this.health--;
+        if (this.health <= 0) {
+            this.alive = false;
+        }
+    }
+
+    isDead() {
+        return !this.alive;
+    }
+}
+
 class Game {
     constructor() {
         this.canvas = document.getElementById('gameCanvas');
@@ -658,6 +736,12 @@ class Game {
         this.kiroImage = new Image();
         this.kiroImage.src = 'kiro_logo.png';
         
+        // Load enemy images
+        this.googleImage = new Image();
+        this.googleImage.src = 'google.png';
+        this.azureImage = new Image();
+        this.azureImage.src = 'azure.png';
+        
         this.init();
         this.setupEventListeners();
         this.gameLoop();
@@ -667,6 +751,7 @@ class Game {
         this.player = new Player(100, 100, this.kiroImage);
         this.platforms = this.createLevel(this.currentLevel);
         this.collectibles = this.createCollectibles(this.currentLevel);
+        this.enemies = this.createEnemies(this.currentLevel);
         this.cameraX = 0;
     }
 
@@ -723,6 +808,26 @@ class Game {
         return collectibles;
     }
 
+    createEnemies(level) {
+        const enemies = [];
+        
+        // Place Google enemies (blue)
+        enemies.push(new Enemy(500, 510, 'google', this.googleImage));
+        enemies.push(new Enemy(900, 360, 'google', this.googleImage));
+        enemies.push(new Enemy(1300, 240, 'google', this.googleImage));
+        enemies.push(new Enemy(1800, 310, 'google', this.googleImage));
+        enemies.push(new Enemy(2400, 310, 'google', this.googleImage));
+        
+        // Place Azure enemies (blue)
+        enemies.push(new Enemy(700, 510, 'azure', this.azureImage));
+        enemies.push(new Enemy(1100, 310, 'azure', this.azureImage));
+        enemies.push(new Enemy(1500, 360, 'azure', this.azureImage));
+        enemies.push(new Enemy(2000, 160, 'azure', this.azureImage));
+        enemies.push(new Enemy(2700, 410, 'azure', this.azureImage));
+        
+        return enemies;
+    }
+
     setupEventListeners() {
         window.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft' || e.key === 'a') this.keys.left = true;
@@ -775,6 +880,64 @@ class Game {
             }
         });
 
+        // Update enemies
+        this.enemies.forEach(enemy => {
+            enemy.update();
+            
+            // Check collision with player
+            if (enemy.checkCollisionWithPlayer(this.player)) {
+                this.lives--;
+                this.updateUI();
+                // Trigger explosion at collision point
+                this.particleSystem.createExplosion(
+                    enemy.x + enemy.width / 2,
+                    enemy.y + enemy.height / 2
+                );
+                
+                if (this.lives <= 0) {
+                    this.endGame();
+                } else {
+                    // Respawn player
+                    this.player.x = 100;
+                    this.player.y = 100;
+                    this.player.velocityX = 0;
+                    this.player.velocityY = 0;
+                    this.cameraX = 0;
+                }
+            }
+        });
+
+        // Check fireball collisions with enemies
+        this.projectileManager.fireballs.forEach(fireball => {
+            this.enemies.forEach(enemy => {
+                if (enemy.checkCollisionWithFireball(fireball)) {
+                    enemy.takeDamage();
+                    fireball.deactivate();
+                    
+                    // Trigger explosion
+                    this.particleSystem.createExplosion(
+                        enemy.x + enemy.width / 2,
+                        enemy.y + enemy.height / 2
+                    );
+                    
+                    // Award points for killing enemy
+                    if (enemy.isDead()) {
+                        this.scoreManager.addScore(500);
+                        this.updateUI();
+                        
+                        // Check for new high score
+                        if (this.scoreManager.isNewHighScore()) {
+                            this.particleSystem.createConfetti(CONFIG.canvas.width, CONFIG.canvas.height);
+                            this.scoreManager.clearNewHighScoreFlag();
+                        }
+                    }
+                }
+            });
+        });
+
+        // Remove dead enemies
+        this.enemies = this.enemies.filter(enemy => !enemy.isDead());
+
         // Smooth camera follow
         const targetCameraX = this.player.x - CONFIG.canvas.width / 3;
         this.cameraX += (targetCameraX - this.cameraX) * CONFIG.camera.smoothness;
@@ -814,6 +977,9 @@ class Game {
 
         // Draw collectibles
         this.collectibles.forEach(collectible => collectible.draw(this.ctx, this.cameraX));
+
+        // Draw enemies
+        this.enemies.forEach(enemy => enemy.draw(this.ctx, this.cameraX));
 
         // Draw particles
         this.particleSystem.draw(this.ctx, this.cameraX);
